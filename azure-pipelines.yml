@@ -1,0 +1,47 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+variables:
+  vmImageName: 'windows-latest'
+stages:
+  - stage: 
+    displayName: Terraform 
+    pool:
+      vmImage: '$(vmImageName)'
+    jobs:
+      - job:
+        steps:
+        - task: TerraformInstaller@0
+          inputs:
+            terraformVersion: 'latest'
+      
+        - task: TerraformCLI@0
+          inputs:
+            command: 'init'
+            backendType: 'azurerm'
+            backendServiceArm: 'Visual Studio Enterprise Subscription(a3493b78-be1a-4dd6-94a6-f6a31b6ee6d7)'
+            backendAzureRmResourceGroupName: 'wizu'
+            backendAzureRmStorageAccountName: 'asdfdff'
+            backendAzureRmContainerName: 'wizu'
+            backendAzureRmKey: 'cicd.tfstate'
+            allowTelemetryCollection: true
+        
+
+        - task: TerraformCLI@0
+          inputs:
+            command: 'plan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/StorageAccount-Terraform'
+            environmentServiceName: 'Visual Studio Enterprise Subscription(a3493b78-be1a-4dd6-94a6-f6a31b6ee6d7)'
+            allowTelemetryCollection: true
+            
+        
+        - task: TerraformCLI@0
+          inputs:
+            command: 'apply'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/StorageAccount-Terraform'
+            environmentServiceName: 'Visual Studio Enterprise Subscription(a3493b78-be1a-4dd6-94a6-f6a31b6ee6d7)'
+            allowTelemetryCollection: true
